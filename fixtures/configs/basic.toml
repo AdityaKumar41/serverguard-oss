@@ -1,0 +1,15 @@
+[serverguard]
+instance_id = "local-dev"
+data_dir = "./tmp/basic-data"
+
+[[log_sources]]
+name = "auth"
+path = "./fixtures/logs/auth.log"
+type = "ssh_auth"
+
+[[detectors]]
+name = "ssh_bruteforce"
+enabled = true
+source = "auth"
+failed_attempt_threshold = 5
+window_seconds = 60

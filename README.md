@@ -1,10 +1,10 @@
 <div align="center">
 
-# 🛡️ ServerGuard
+<img src="image/image.png" alt="ServerGuard" width="600"/>
 
 ### Autonomous Server Guardian
 
-**Detect threats. Protect your server. Self-improve over time.**
+**Detect threats. Get alerts. Self-improve. Protect your server 24/7.**
 
 [![CI](https://github.com/serverguard-oss/serverguard/actions/workflows/ci.yml/badge.svg)](https://github.com/serverguard-oss/serverguard/actions)
 [![PyPI version](https://img.shields.io/pypi/v/serverguard?color=green)](https://pypi.org/project/serverguard/)
@@ -12,46 +12,56 @@
 [![License: MIT](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
 [![Security](https://img.shields.io/badge/security-hardened-green)](SECURITY.md)
 
-[Install](#install) · [Quick Start](#quick-start) · [Commands](#commands) · [Configuration](#configuration) · [Security](#security) · [Contributing](#contributing)
+[Install](#install) · [Setup](#quick-start) · [Commands](#commands) · [AI Features](#ai-features) · [Notifications](#notifications) · [Security](#security-architecture) · [Contributing](#contributing)
 
 </div>
 
 ---
 
-ServerGuard is a **Python-powered autonomous server guardian** that runs as a lightweight daemon on any Linux or macOS server. It monitors your system logs in real time, detects threats like SSH brute-force attacks, stores normalized security events, and will soon deliver alerts, take self-healing actions, and improve its threat model from experience.
+ServerGuard is a **Python-powered autonomous server guardian** — a single CLI that monitors your Linux server in real time, detects SSH brute-force attacks (and more), sends instant alerts to Telegram/Discord/Slack/Email, uses AI to explain and contextualize every threat, and quietly improves its own detection thresholds from experience.
 
-Think of it as a security co-pilot for your server — always watching, always learning.
+Set it up in 60 seconds. Run it forever.
 
 ```
-2026-06-22T10:15:20  WARNING  [security.ssh_bruteforce] 203.0.113.10
-                              → 5 failed SSH attempts in 60s — BLOCKED
+$ sgd --config ~/.serverguard/config.toml
+
+2026-06-22T20:15:37  INFO    Daemon started — watching 1 log source(s)
+2026-06-22T20:15:37  WARNING [security.ssh_bruteforce] 203.0.113.10
+                             → 5 failed SSH attempts in 60s — ALERT SENT
+
+→ Telegram: 🔴 SSH brute-force detected
+   📍 IP Location: Shanghai, China (Alibaba Cloud)
+   🤖 AI Analysis: Automated credential stuffing attack from known hosting
+                   range. Recommend: ufw deny from 203.0.113.10 to any port 22
 ```
 
 ---
 
 ## Why ServerGuard?
 
-| | ServerGuard | fail2ban | manual monitoring |
+| | ServerGuard | fail2ban | manual watching |
 |---|---|---|---|
-| Easy CLI setup | ✅ | ⚠️ complex config | ❌ |
-| AI-ready architecture | ✅ | ❌ | ❌ |
+| One-command setup | ✅ `sg setup` | ❌ complex config | ❌ |
+| AI threat summaries | ✅ | ❌ | ❌ |
+| IP geolocation per alert | ✅ | ❌ | ❌ |
+| Self-improving thresholds | ✅ | ❌ | ❌ |
+| Telegram / Discord / Slack | ✅ | ❌ | ❌ |
 | Tamper-evident audit log | ✅ | ❌ | ❌ |
-| Self-improving threat model | ✅ (v0.1) | ❌ | ❌ |
-| Notification anywhere | ✅ (v0.1) | ⚠️ | ❌ |
-| Single Python install | ✅ | ❌ | ❌ |
-| Hardened systemd service | ✅ | ⚠️ | ❌ |
+| Ask AI about your server | ✅ `sg ask` | ❌ | ❌ |
+| Hot-swap AI providers | ✅ `sg model` | ❌ | ❌ |
+| Hardened systemd unit | ✅ | ⚠️ | ❌ |
 
 ---
 
 ## Install
 
-**One line (Linux/macOS):**
+**One line:**
 
 ```bash
 curl -fsSL https://raw.githubusercontent.com/serverguard-oss/serverguard/main/scripts/install.sh | bash
 ```
 
-**Or via pipx:**
+**Or via pipx (recommended):**
 
 ```bash
 pipx install serverguard
@@ -63,48 +73,41 @@ pipx install serverguard
 pip install serverguard
 ```
 
-Full installation guide: [docs/install.md](docs/install.md)
+Requires Python 3.11+. Works on Ubuntu, Debian, RHEL/CentOS, Fedora, and macOS.
 
 ---
 
 ## Quick Start
 
-**1. Create a config file:**
-
-```toml
-# /etc/serverguard/config.toml
-
-[serverguard]
-instance_id = "my-server"
-data_dir    = "/var/lib/serverguard"
-
-[[log_sources]]
-name = "auth"
-type = "ssh_auth"
-path = "/var/log/auth.log"
-
-[[detectors]]
-name                     = "ssh_bruteforce"
-enabled                  = true
-source                   = "auth"
-failed_attempt_threshold = 5
-window_seconds           = 60
-```
-
-**2. Start the daemon:**
+### Step 1 — Run the setup wizard
 
 ```bash
-sgd --config /etc/serverguard/config.toml
+sg setup
 ```
 
-**3. Check status and events (in another terminal):**
+The wizard walks you through:
+
+1. **AI Model Provider** — OpenAI, Anthropic, OpenRouter, Ollama (local/free), or skip
+2. **Notification Channels** — Telegram, Discord, Slack, Webhook, Email (add multiple)
+3. **Log Sources** — auto-detected from your system (`/var/log/auth.log`, etc.)
+4. **Instance Name** — your server's name in alerts
+
+Everything is saved to `~/.serverguard/config.toml`. API keys go in `~/.serverguard/.env` (never in the TOML).
+
+### Step 2 — Start the daemon
 
 ```bash
-sg status --config /etc/serverguard/config.toml
-sg events --config /etc/serverguard/config.toml
+sgd --config ~/.serverguard/config.toml
 ```
 
-**4. Run as a system service:**
+### Step 3 — Check status
+
+```bash
+sg status --config ~/.serverguard/config.toml
+sg events --config ~/.serverguard/config.toml
+```
+
+### Step 4 — Run as a system service
 
 ```bash
 sudo cp packaging/serverguard.service /etc/systemd/system/
@@ -115,30 +118,198 @@ sudo systemctl enable --now serverguard
 
 ## Commands
 
+### Core
+
 | Command | Description |
 |---|---|
-| `sgd --config <path>` | Start the monitoring daemon (production) |
+| `sg setup` | Interactive setup wizard (AI + notifications + log sources) |
+| `sg status --config <path>` | Show daemon status, config, recent event counts |
+| `sg events --config <path>` | List events, reverse-chronological, color-coded severity |
+| `sgd --config <path>` | Start the monitoring daemon |
 | `sgd --config <path> --replay` | Replay existing log content (testing/demo) |
-| `sg status --config <path>` | Show daemon status, config summary |
-| `sg events --config <path>` | List events (reverse chronological, color-coded) |
+
+### AI
+
+| Command | Description |
+|---|---|
+| `sg ask --config <path> "question"` | Ask AI anything about your server's security |
+| `sg model` | Interactive AI provider switcher |
+| `sg model set openai gpt-4o` | Set provider non-interactively |
+| `sg model set ollama llama3.2` | Switch to local Ollama (free, no API key) |
+| `sg model list` | List all supported providers and models |
+
+### Security
+
+| Command | Description |
+|---|---|
 | `sg audit verify --config <path>` | Verify tamper-evident audit chain integrity |
 | `sg --version` | Print version |
 
 ---
 
-## Configuration
+## AI Features
 
-Full reference: [docs/configuration.md](docs/configuration.md)
+ServerGuard integrates AI at every layer — not as a gimmick, but to make server security actually understandable.
 
-Key config sections:
+### 1. Instant Threat Summaries
+
+Every security event gets an AI-generated plain-English explanation:
+
+```
+🤖 AI Analysis: Automated credential stuffing attack from known cloud
+   hosting range. No successful logins observed. Recommended action:
+   ufw deny from 203.0.113.10 to any port 22
+```
+
+### 2. IP Geolocation & Reputation
+
+Every attacker IP is automatically enriched:
+
+```
+🌍 IP Location: Shanghai, China (Alibaba Cloud)
+   ⚠️  Hosting provider (common bot origin)
+```
+
+### 3. Self-Learning Loop
+
+After accumulating 10 events of the same type, ServerGuard:
+- Analyzes the pattern with AI
+- Recommends tightening detection thresholds
+- Saves the suggestion to `~/.serverguard/data/learned_suggestions.json`
+- Logs it as a `learning.suggestion` event
+
+### 4. AI Q&A (`sg ask`)
+
+Ask anything about your server's security history in plain English:
+
+```bash
+sg ask --config ~/.serverguard/config.toml "Am I under attack right now?"
+sg ask --config ~/.serverguard/config.toml "Which IP has hit me the most?"
+sg ask --config ~/.serverguard/config.toml "Should I block the 203.0.113.0/24 range?"
+```
+
+### Supported AI Providers
+
+| Provider | Models | Setup |
+|---|---|---|
+| **OpenAI** | GPT-4o, GPT-4o-mini | `OPENAI_API_KEY` |
+| **Anthropic** | Claude 3.5 Sonnet, Claude 3 Haiku | `ANTHROPIC_API_KEY` |
+| **OpenRouter** | 200+ models (one key) | `OPENROUTER_API_KEY` |
+| **Ollama** | llama3.2, mistral, gemma3 (local, free) | None needed |
+
+Switch providers anytime without restarting: `sg model set ollama llama3.2`
+
+---
+
+## Notifications
+
+Configure during `sg setup` or add manually to `config.toml`.
+
+### Telegram (Recommended)
+
+Get alerts on your phone instantly. Also supports bot commands (`/status`, `/events`, `/ask`).
+
+```bash
+# 1. Create a bot: message @BotFather → /newbot → copy token
+# 2. Set env vars (in ~/.serverguard/.env):
+SERVERGUARD_TELEGRAM_BOT_TOKEN=123456:ABC-DEF...
+SERVERGUARD_TELEGRAM_CHAT_ID=-100123456789
+```
+
+```toml
+# In config.toml:
+[[notifiers]]
+type    = "telegram"
+enabled = true
+```
+
+**What a Telegram alert looks like:**
+```
+🔴 ServerGuard Alert
+
+Type: security.ssh_bruteforce
+Severity: WARNING
+Subject: 203.0.113.10
+Time: 2026-06-22T20:15:37
+
+5 failed SSH attempts from 203.0.113.10 within 60s
+
+🤖 AI Analysis: Automated attack from cloud VPS...
+🌍 IP Location: Shanghai, China (Alibaba Cloud)
+```
+
+### Discord
+
+```bash
+SERVERGUARD_DISCORD_WEBHOOK_URL=https://discord.com/api/webhooks/...
+```
+
+### Slack
+
+```bash
+SERVERGUARD_SLACK_WEBHOOK_URL=https://hooks.slack.com/services/...
+```
+
+### Email (SMTP)
+
+```bash
+SERVERGUARD_SMTP_HOST=smtp.gmail.com
+SERVERGUARD_SMTP_PORT=587
+SERVERGUARD_SMTP_USER=alerts@example.com
+SERVERGUARD_SMTP_PASSWORD=your-app-password
+SERVERGUARD_SMTP_TO=ops@example.com
+```
+
+### Custom Webhook (HMAC-signed)
+
+```bash
+SERVERGUARD_WEBHOOK_URL=https://your-service.com/hook
+SERVERGUARD_WEBHOOK_SECRET=your-signing-secret  # optional
+```
+
+---
+
+## Detectors
+
+| Detector | Status | Description |
+|---|---|---|
+| `ssh_bruteforce` | ✅ v0.0.1 | Sliding-window failed SSH login counter |
+| `port_scan` | 🔜 v0.1.0 | Rapid port sweep detection |
+| `anomaly_baseline` | 🔜 v0.2.0 | AI-powered rolling anomaly scoring |
+
+---
+
+## Security Architecture
+
+ServerGuard uses defense-in-depth. It guards itself as fiercely as it guards your server.
+
+| Layer | Implementation |
+|---|---|
+| **Input sanitization** | All log lines bounded at 4 KiB, null bytes stripped, control chars removed |
+| **Rate limiting** | 10,000 lines/sec/source cap — prevents CPU/RAM exhaustion from log flooding |
+| **Tamper-evident audit** | SHA-256 hash-chained `audit_chain` table — verify with `sg audit verify` |
+| **Config permissions** | Warns if config is world-readable or data dir is world-writable |
+| **Least privilege** | Dedicated `serverguard` system user; root usage warned loudly |
+| **Hardened systemd** | `NoNewPrivileges`, `ProtectSystem=strict`, syscall whitelist, memory limit |
+| **Secrets in env only** | No API keys in config files, ever |
+| **Zero telemetry** | No outbound connections except configured notifiers and your AI provider |
+| **Minimal dependencies** | Small attack surface; all deps pinned and audited in CI |
+
+---
+
+## Configuration Reference
 
 ```toml
 [serverguard]
-instance_id = "prod-01"
-data_dir    = "/var/lib/serverguard"
+instance_id = "prod-web-01"
+data_dir    = "~/.serverguard/data"
 
 [security]
-max_lines_per_second = 10000   # rate-limit protection
+max_lines_per_second = 10000
+
+[ai]
+provider = "openai"       # openai | anthropic | openrouter | ollama | disabled
+model    = "gpt-4o"
 
 [[log_sources]]
 name = "auth"
@@ -151,57 +322,17 @@ enabled                  = true
 source                   = "auth"
 failed_attempt_threshold = 5
 window_seconds           = 60
+
+[[notifiers]]
+type    = "telegram"
+enabled = true
+
+[[notifiers]]
+type    = "discord"
+enabled = true
 ```
 
----
-
-## Detectors
-
-| Detector | Status | Description |
-|---|---|---|
-| `ssh_bruteforce` | ✅ v0.0.1 | Sliding-window failed SSH login counter with deduplication |
-| `port_scan` | 🔜 v0.1.0 | Detect rapid connection attempts across ports |
-| `anomaly_baseline` | 🔜 v0.2.0 | AI-powered rolling mean + σ anomaly scoring |
-
----
-
-## Notifications (v0.1.0)
-
-Send alerts anywhere when threats are detected:
-
-| Channel | Status |
-|---|---|
-| Slack webhook | 🔜 v0.1.0 |
-| Telegram bot | 🔜 v0.1.0 |
-| Email (SMTP) | 🔜 v0.1.0 |
-| Generic webhook | 🔜 v0.1.0 |
-| Discord | 🔜 v0.1.0 |
-
-Configure via environment variables — no secrets in config files:
-
-```bash
-export SERVERGUARD_TELEGRAM_BOT_TOKEN="123:abc..."
-export SERVERGUARD_TELEGRAM_CHAT_ID="-100123..."
-```
-
----
-
-## Security
-
-ServerGuard is built with defense-in-depth to protect the machines it runs on:
-
-| Layer | Implementation |
-|---|---|
-| **Input sanitization** | All log lines length-bounded (4 KiB), control chars stripped, null bytes rejected |
-| **Rate limiting** | 10,000 lines/sec per source cap — prevents log flooding exhausting CPU/RAM |
-| **Tamper-evident audit** | SHA-256 hash-chained audit table; verify with `sg audit verify` |
-| **Config permissions** | Warns if world-readable config or world-writable data dir |
-| **Least privilege** | Runs as dedicated `serverguard` system user (not root) |
-| **Systemd hardening** | `NoNewPrivileges`, `ProtectSystem=strict`, syscall filtering, memory limits |
-| **No telemetry** | Zero outbound connections — all data stays on your server |
-| **Minimal deps** | Small attack surface; all dependencies pinned and audited in CI |
-
-Security policy & responsible disclosure: [SECURITY.md](SECURITY.md)
+Full reference: [docs/configuration.md](docs/configuration.md)
 
 ---
 
@@ -209,11 +340,11 @@ Security policy & responsible disclosure: [SECURITY.md](SECURITY.md)
 
 | Version | Features |
 |---|---|
-| **v0.0.1** | SSH brute-force detection, CLI, tamper-evident audit log, security hardening |
-| **v0.1.0** | Slack/Telegram/Email/Webhook notifications, port scan detector, log rotation |
-| **v0.2.0** | Self-healing actions (auto-ban IPs via iptables/ufw), AI anomaly baseline |
-| **v0.3.0** | `sg learn` custom detection patterns, per-IP threat memory, `sg schedule` routines |
-| **v1.0.0** | Stable API, multi-server dashboard, plugin system |
+| **v0.0.1** | SSH brute-force, AI summaries + geo, Telegram/Discord/Slack/Email, setup wizard, `sg ask`, self-learning loop, tamper-evident audit, security hardening |
+| **v0.1.0** | Port scan detector, log rotation, gateway bot (`/status` from Telegram), `sg gateway telegram` |
+| **v0.2.0** | Self-healing actions (`ufw` / `iptables` auto-ban), AI anomaly baseline, `sg schedule` cron routines |
+| **v0.3.0** | Multi-server dashboard, plugin system, `sg learn` custom patterns |
+| **v1.0.0** | Stable API, Windows PTY support, enterprise features |
 
 ---
 
@@ -223,21 +354,25 @@ Security policy & responsible disclosure: [SECURITY.md](SECURITY.md)
 git clone https://github.com/serverguard-oss/serverguard
 cd serverguard
 
-make install-dev   # creates .venv + installs deps
-make test          # 44 tests — unit + contract
-make lint          # ruff check
-make run-daemon    # demo against shared fixture
+make install-dev    # creates .venv + installs all dev deps
+make test           # 44+ tests (unit + contract)
+make lint           # ruff check
+make run-daemon     # demo against shared fixture (detects brute-force)
+make run-events     # show events from the demo run
 ```
+
+See [AGENTS.md](AGENTS.md) for the full developer guide: architecture, contribution rubric, footprint ladder, security checklist, and step-by-step guides for adding detectors/notifiers/AI providers.
 
 ---
 
 ## Contributing
 
-All contributions are welcome! See [CONTRIBUTING.md](CONTRIBUTING.md) for guidelines.
+All contributions welcome! See [CONTRIBUTING.md](CONTRIBUTING.md).
 
-- 🐛 [Report a bug](.github/ISSUE_TEMPLATE/bug_report.md)
-- 💡 [Request a feature](.github/ISSUE_TEMPLATE/feature_request.md)
-- 🔒 [Report a security issue](SECURITY.md) (private)
+- 🐛 [Bug report](.github/ISSUE_TEMPLATE/bug_report.md)
+- 💡 [Feature request](.github/ISSUE_TEMPLATE/feature_request.md)
+- 🔒 [Security issue](SECURITY.md) (private disclosure)
+- 📖 [Developer guide](AGENTS.md)
 
 ---
 

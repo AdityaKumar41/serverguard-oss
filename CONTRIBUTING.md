@@ -33,8 +33,8 @@ make lint
 
 - Files must stay at or below **150 lines** (split by responsibility when approaching the limit)
 - All functions must have a docstring explaining intent
-- New detectors must live in `serverguard/detectors/` and extend `Detector` base class
-- New notifiers must live in `serverguard/notifiers/` and extend `Notifier` base class
+- New detectors must live in `detectors/` and extend `Detector` base class
+- New notifiers must live in `notifiers/` and extend `Notifier` base class
 - No secrets, tokens, or API keys in code or tests — use `os.environ` + `.env.example`
 
 ### Tests

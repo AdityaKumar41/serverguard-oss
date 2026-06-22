@@ -30,13 +30,13 @@ jobs:
         run: uv pip install -e ".[dev]" --system
 
       - name: Lint (ruff check)
-        run: ruff check serverguard/ tests/
+        run: ruff check agent cli config daemon detectors events gateway notifiers parsers security storage tests version.py
 
       - name: Format check (ruff format)
-        run: ruff format --check serverguard/ tests/
+        run: ruff format --check agent cli config daemon detectors events gateway notifiers parsers security storage tests version.py
 
       - name: Run tests
-        run: pytest tests/ -v --tb=short --cov=serverguard --cov-report=xml
+        run: pytest tests/ -v --tb=short --cov=. --cov-report=xml
 
       - name: Upload coverage
         if: matrix.python-version == '3.11'

@@ -27,8 +27,8 @@ logger = logging.getLogger(__name__)
 
 _SEVERITY_COLORS = {
     "critical": 0xFF0000,  # red
-    "warning": 0xFF9900,   # orange
-    "info": 0x00CC44,      # green
+    "warning": 0xFF9900,  # orange
+    "info": 0x00CC44,  # green
 }
 
 
@@ -76,13 +76,15 @@ class DiscordNotifier(Notifier):
         payload = {
             "username": "ServerGuard",
             "avatar_url": "https://raw.githubusercontent.com/serverguard-oss/serverguard/main/image/image.png",
-            "embeds": [{
-                "title": f"🛡️ Security Alert — {event.type}",
-                "description": event.message,
-                "color": color,
-                "fields": fields,
-                "footer": {"text": "ServerGuard v0.0.1"},
-            }],
+            "embeds": [
+                {
+                    "title": f"🛡️ Security Alert — {event.type}",
+                    "description": event.message,
+                    "color": color,
+                    "fields": fields,
+                    "footer": {"text": "ServerGuard v0.0.1"},
+                }
+            ],
         }
 
         try:

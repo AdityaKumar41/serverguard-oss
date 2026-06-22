@@ -13,8 +13,6 @@ from __future__ import annotations
 
 from rich.console import Console
 from rich.panel import Panel
-from rich.spinner import Spinner
-from rich import print as rprint
 
 console = Console()
 
@@ -22,6 +20,7 @@ console = Console()
 def run(config: str, question: str) -> None:
     """Run an AI-powered Q&A over the event database."""
     import asyncio
+
     asyncio.run(_run_async(config, question))
 
 
@@ -33,7 +32,7 @@ async def _run_async(config: str, question: str) -> None:
         cfg = load(config)
     except (FileNotFoundError, ValueError) as exc:
         console.print(f"[bold red]Error:[/] {exc}")
-        raise SystemExit(1)
+        raise SystemExit(1) from None
 
     # Load AI config
     ai_cfg = _load_ai_cfg(cfg)
@@ -71,36 +70,35 @@ async def _run_async(config: str, question: str) -> None:
     user_msg = f"Recent security events from this server:\n{context}\n\nQuestion: {question}"
 
     from agent.client import chat
+
     console.print(f"\n[dim]🤖 Asking {ai_cfg.provider.value}/{ai_cfg.model}...[/]\n")
 
     answer = await chat(ai_cfg, system_prompt, user_msg)
 
     if answer:
-        console.print(Panel(
-            answer,
-            title=f"🤖 AI Answer — {ai_cfg.provider.value}/{ai_cfg.model}",
-            border_style="cyan",
-        ))
+        console.print(
+            Panel(
+                answer,
+                title=f"🤖 AI Answer — {ai_cfg.provider.value}/{ai_cfg.model}",
+                border_style="cyan",
+            )
+        )
     else:
         console.print("[red]AI returned no response. Check your API key and connection.[/]")
         raise SystemExit(1)
 
 
 def _load_ai_cfg(cfg):
-    from agent.providers import AIConfig
     # Try to load [ai] section from raw config
-    import sys
-    if sys.version_info >= (3, 11):
-        import tomllib
-    else:
-        try:
-            import tomllib
-        except ImportError:
-            import tomli as tomllib
+    import tomllib
     from pathlib import Path
+
+    from agent.providers import AIConfig
+
     try:
         raw = tomllib.loads(Path(cfg.config_path).read_text())
         return AIConfig.from_dict(raw.get("ai", {}))
     except Exception:
         from agent.providers import AIConfig, ProviderName
+
         return AIConfig(provider=ProviderName.DISABLED)

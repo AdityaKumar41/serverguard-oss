@@ -5,10 +5,10 @@ from __future__ import annotations
 import os
 
 import typer
+from rich import box
 from rich.console import Console
 from rich.panel import Panel
 from rich.table import Table
-from rich import box
 
 from config import loader as config_loader
 
@@ -19,12 +19,12 @@ def run(config_path: str) -> None:
     """Display ServerGuard instance status."""
     try:
         cfg = config_loader.load(config_path)
-    except FileNotFoundError as exc:
-        console.print(f"[bold red]ERROR[/] {exc}")
-        raise typer.Exit(1)
+    except FileNotFoundError:
+        console.print("[bold red]ERROR[/] Config file not found")
+        raise typer.Exit(1) from None
     except ValueError as exc:
         console.print(f"[bold red]ERROR[/] Config validation failed: {exc}")
-        raise typer.Exit(1)
+        raise typer.Exit(1) from None
 
     db_exists = os.path.exists(cfg.db_path)
     db_status = "[green]exists[/]" if db_exists else "[yellow]not created yet[/]"
@@ -52,7 +52,9 @@ def run(config_path: str) -> None:
 
     if cfg.log_sources:
         src_table = Table(
-            "Name", "Type", "Path",
+            "Name",
+            "Type",
+            "Path",
             box=box.SIMPLE_HEAD,
             style="dim",
             title="[cyan]Log Sources[/]",
@@ -64,7 +66,11 @@ def run(config_path: str) -> None:
 
     if cfg.detectors:
         det_table = Table(
-            "Name", "Enabled", "Source", "Threshold", "Window",
+            "Name",
+            "Enabled",
+            "Source",
+            "Threshold",
+            "Window",
             box=box.SIMPLE_HEAD,
             style="dim",
             title="[magenta]Detectors[/]",

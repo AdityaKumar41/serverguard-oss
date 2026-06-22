@@ -15,15 +15,12 @@ Usage:
 
 from __future__ import annotations
 
-import sys
-
 import typer
 from rich.console import Console
-from rich.panel import Panel
 from rich.prompt import Prompt
 from rich.table import Table
 
-from agent.providers import PROVIDER_MODELS, PROVIDER_BASE_URLS, ProviderName
+from agent.providers import PROVIDER_MODELS, ProviderName
 
 console = Console()
 

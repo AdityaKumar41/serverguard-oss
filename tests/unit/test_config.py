@@ -8,9 +8,8 @@ from pathlib import Path
 import pytest
 
 from config.loader import load
+from config.models import Config, DetectorConfig, LogSource, ServerGuardSection
 from config.validator import validate
-from config.models import Config, ServerGuardSection, LogSource, DetectorConfig
-
 
 # ── Fixtures ─────────────────────────────────────────────────────────────────
 
@@ -41,6 +40,7 @@ def valid_config_file(tmp_path: Path) -> Path:
 
 
 # ── Tests: happy path ─────────────────────────────────────────────────────────
+
 
 def test_load_valid_config(valid_config_file: Path) -> None:
     cfg = load(str(valid_config_file))
@@ -75,6 +75,7 @@ def test_db_path(valid_config_file: Path) -> None:
 
 # ── Tests: file errors ────────────────────────────────────────────────────────
 
+
 def test_missing_config_file_raises() -> None:
     with pytest.raises(FileNotFoundError, match="Config file not found"):
         load("/nonexistent/path/config.toml")
@@ -89,6 +90,7 @@ def test_invalid_toml_raises(tmp_path: Path) -> None:
 
 # ── Tests: validation rules ───────────────────────────────────────────────────
 
+
 def _make_cfg(**overrides) -> Config:  # type: ignore[no-untyped-def]
     """Build a minimal valid Config, with overrides for specific fields."""
     sg = ServerGuardSection(
@@ -101,13 +103,15 @@ def _make_cfg(**overrides) -> Config:  # type: ignore[no-untyped-def]
     )
     detectors = overrides.get(
         "detectors",
-        [DetectorConfig(
-            name="ssh_bruteforce",
-            enabled=True,
-            source="auth",
-            failed_attempt_threshold=5,
-            window_seconds=60,
-        )],
+        [
+            DetectorConfig(
+                name="ssh_bruteforce",
+                enabled=True,
+                source="auth",
+                failed_attempt_threshold=5,
+                window_seconds=60,
+            )
+        ],
     )
     return Config(serverguard=sg, log_sources=log_sources, detectors=detectors)
 
@@ -143,13 +147,15 @@ def test_unsupported_source_type_fails() -> None:
 
 def test_detector_references_missing_source_fails() -> None:
     sources = [LogSource(name="auth", path="./a.log", type="ssh_auth")]
-    detectors = [DetectorConfig(
-        name="ssh_bruteforce",
-        enabled=True,
-        source="nonexistent",
-        failed_attempt_threshold=5,
-        window_seconds=60,
-    )]
+    detectors = [
+        DetectorConfig(
+            name="ssh_bruteforce",
+            enabled=True,
+            source="nonexistent",
+            failed_attempt_threshold=5,
+            window_seconds=60,
+        )
+    ]
     cfg = _make_cfg(log_sources=sources, detectors=detectors)
     with pytest.raises(ValueError, match="unknown log source"):
         validate(cfg)
@@ -157,13 +163,15 @@ def test_detector_references_missing_source_fails() -> None:
 
 def test_zero_threshold_fails() -> None:
     sources = [LogSource(name="auth", path="./a.log", type="ssh_auth")]
-    detectors = [DetectorConfig(
-        name="ssh_bruteforce",
-        enabled=True,
-        source="auth",
-        failed_attempt_threshold=0,
-        window_seconds=60,
-    )]
+    detectors = [
+        DetectorConfig(
+            name="ssh_bruteforce",
+            enabled=True,
+            source="auth",
+            failed_attempt_threshold=0,
+            window_seconds=60,
+        )
+    ]
     cfg = _make_cfg(log_sources=sources, detectors=detectors)
     with pytest.raises(ValueError, match="failed_attempt_threshold"):
         validate(cfg)
@@ -171,13 +179,15 @@ def test_zero_threshold_fails() -> None:
 
 def test_zero_window_fails() -> None:
     sources = [LogSource(name="auth", path="./a.log", type="ssh_auth")]
-    detectors = [DetectorConfig(
-        name="ssh_bruteforce",
-        enabled=True,
-        source="auth",
-        failed_attempt_threshold=5,
-        window_seconds=0,
-    )]
+    detectors = [
+        DetectorConfig(
+            name="ssh_bruteforce",
+            enabled=True,
+            source="auth",
+            failed_attempt_threshold=5,
+            window_seconds=0,
+        )
+    ]
     cfg = _make_cfg(log_sources=sources, detectors=detectors)
     with pytest.raises(ValueError, match="window_seconds"):
         validate(cfg)
@@ -187,12 +197,18 @@ def test_duplicate_detector_name_fails() -> None:
     sources = [LogSource(name="auth", path="./a.log", type="ssh_auth")]
     detectors = [
         DetectorConfig(
-            name="ssh_bruteforce", enabled=True, source="auth",
-            failed_attempt_threshold=5, window_seconds=60,
+            name="ssh_bruteforce",
+            enabled=True,
+            source="auth",
+            failed_attempt_threshold=5,
+            window_seconds=60,
         ),
         DetectorConfig(
-            name="ssh_bruteforce", enabled=True, source="auth",
-            failed_attempt_threshold=3, window_seconds=30,
+            name="ssh_bruteforce",
+            enabled=True,
+            source="auth",
+            failed_attempt_threshold=3,
+            window_seconds=30,
         ),
     ]
     cfg = _make_cfg(log_sources=sources, detectors=detectors)

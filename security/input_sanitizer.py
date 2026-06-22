@@ -13,8 +13,8 @@ Rules:
 from __future__ import annotations
 
 import logging
-import re
 import os
+import re
 from pathlib import Path
 
 logger = logging.getLogger(__name__)
@@ -90,9 +90,10 @@ def check_config_file_permissions(path: str) -> None:
         mode = oct(os.stat(path).st_mode & 0o777)
         if os.stat(path).st_mode & 0o004:  # world-readable bit
             logger.warning(
-                "Config file %s is world-readable (mode %s). "
-                "Recommend: chmod 600 %s",
-                path, mode, path,
+                "Config file %s is world-readable (mode %s). Recommend: chmod 600 %s",
+                path,
+                mode,
+                path,
             )
     except OSError:
         pass  # Existence check is handled elsewhere.
@@ -105,7 +106,8 @@ def check_data_dir_permissions(data_dir: str) -> None:
         if p.exists() and (os.stat(data_dir).st_mode & 0o002):
             logger.warning(
                 "Data directory %s is world-writable. Recommend: chmod 750 %s",
-                data_dir, data_dir,
+                data_dir,
+                data_dir,
             )
     except OSError:
         pass

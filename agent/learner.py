@@ -15,9 +15,7 @@ from __future__ import annotations
 
 import json
 import logging
-import os
 from pathlib import Path
-from typing import Optional
 
 from agent.client import chat
 from agent.providers import AIConfig
@@ -48,7 +46,7 @@ class Learner:
         self._data_dir = Path(data_dir)
         self._event_buffer: dict[str, list[Event]] = {}  # type -> [event]
 
-    async def observe(self, event: Event) -> Optional[str]:
+    async def observe(self, event: Event) -> str | None:
         """Feed an event to the learner. Returns a learning summary if analysis ran."""
         if not self._ai_cfg.enabled:
             return None
@@ -65,15 +63,13 @@ class Learner:
 
         return None
 
-    async def _analyze(self, event_type: str) -> Optional[str]:
+    async def _analyze(self, event_type: str) -> str | None:
         """Run AI analysis on accumulated events of this type."""
         events = self._event_buffer.get(event_type, [])
         if not events:
             return None
 
-        events_text = "\n".join(
-            f"- [{e.timestamp}] {e.subject}: {e.message}" for e in events
-        )
+        events_text = "\n".join(f"- [{e.timestamp}] {e.subject}: {e.message}" for e in events)
         user_msg = f"Event type: {event_type}\n\nRecent events:\n{events_text}"
 
         logger.info("[learner] Running AI analysis on %d %s events", len(events), event_type)

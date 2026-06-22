@@ -25,7 +25,11 @@ from notifiers.base import Notifier
 
 logger = logging.getLogger(__name__)
 
-_SEVERITY_EMOJI = {"critical": ":red_circle:", "warning": ":large_yellow_circle:", "info": ":large_green_circle:"}
+_SEVERITY_EMOJI = {
+    "critical": ":red_circle:",
+    "warning": ":large_yellow_circle:",
+    "info": ":large_green_circle:",
+}
 
 
 class SlackNotifier(Notifier):
@@ -48,23 +52,39 @@ class SlackNotifier(Notifier):
     async def send(self, event: Event) -> None:
         emoji = _SEVERITY_EMOJI.get(event.severity.lower(), ":white_circle:")
         blocks = [
-            {"type": "header", "text": {"type": "plain_text", "text": f"🛡️ ServerGuard Alert"}},
-            {"type": "section", "fields": [
-                {"type": "mrkdwn", "text": f"*Type:*\n`{event.type}`"},
-                {"type": "mrkdwn", "text": f"*Severity:*\n{emoji} {event.severity.upper()}"},
-                {"type": "mrkdwn", "text": f"*Subject:*\n`{event.subject}`"},
-                {"type": "mrkdwn", "text": f"*Source:*\n{event.source}"},
-            ]},
+            {"type": "header", "text": {"type": "plain_text", "text": "🛡️ ServerGuard Alert"}},
+            {
+                "type": "section",
+                "fields": [
+                    {"type": "mrkdwn", "text": f"*Type:*\n`{event.type}`"},
+                    {"type": "mrkdwn", "text": f"*Severity:*\n{emoji} {event.severity.upper()}"},
+                    {"type": "mrkdwn", "text": f"*Subject:*\n`{event.subject}`"},
+                    {"type": "mrkdwn", "text": f"*Source:*\n{event.source}"},
+                ],
+            },
             {"type": "section", "text": {"type": "mrkdwn", "text": f"*Message:*\n{event.message}"}},
         ]
 
         try:
             meta = json.loads(event.metadata_json or "{}")
             if ai_summary := meta.get("ai_summary"):
-                blocks.append({"type": "section", "text": {"type": "mrkdwn", "text": f"🤖 *AI Analysis:*\n{ai_summary}"}})
+                blocks.append(
+                    {
+                        "type": "section",
+                        "text": {"type": "mrkdwn", "text": f"🤖 *AI Analysis:*\n{ai_summary}"},
+                    }
+                )
             if ip_ctx := meta.get("ip_context"):
-                geo = f"{ip_ctx.get('city', '?')}, {ip_ctx.get('country', '?')} — {ip_ctx.get('isp', '?')}"
-                blocks.append({"type": "section", "text": {"type": "mrkdwn", "text": f"🌍 *IP Location:*\n{geo}"}})
+                geo = (
+                    f"{ip_ctx.get('city', '?')}, {ip_ctx.get('country', '?')} "
+                    f"— {ip_ctx.get('isp', '?')}"
+                )
+                blocks.append(
+                    {
+                        "type": "section",
+                        "text": {"type": "mrkdwn", "text": f"🌍 *IP Location:*\n{geo}"},
+                    }
+                )
         except Exception:  # noqa: BLE001
             pass
 

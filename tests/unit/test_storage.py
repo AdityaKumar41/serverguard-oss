@@ -4,8 +4,8 @@ from __future__ import annotations
 
 import pytest
 
-from storage.sqlite import Store
 from events.model import Event, make_daemon_started, make_daemon_stopping
+from storage.sqlite import Store
 
 
 @pytest.fixture()

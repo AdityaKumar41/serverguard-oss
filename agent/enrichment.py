@@ -10,9 +10,7 @@ This runs asynchronously after an event is stored — it never blocks detection.
 
 from __future__ import annotations
 
-import json
 import logging
-from typing import Optional
 
 import httpx
 
@@ -43,6 +41,7 @@ async def enrich_event(event: Event, ai_cfg: AIConfig) -> dict:
 
     # Run AI summary and geo lookup concurrently.
     import asyncio
+
     ai_task = asyncio.create_task(_ai_summary(event, ai_cfg))
     geo_task = asyncio.create_task(_geo_lookup(event))
 
@@ -56,7 +55,7 @@ async def enrich_event(event: Event, ai_cfg: AIConfig) -> dict:
     return metadata
 
 
-async def _ai_summary(event: Event, ai_cfg: AIConfig) -> Optional[str]:
+async def _ai_summary(event: Event, ai_cfg: AIConfig) -> str | None:
     """Generate a plain-English AI summary of the event."""
     user_msg = (
         f"Event type: {event.type}\n"
@@ -69,11 +68,12 @@ async def _ai_summary(event: Event, ai_cfg: AIConfig) -> Optional[str]:
     return await chat(ai_cfg, _ENRICHMENT_SYSTEM_PROMPT, user_msg)
 
 
-async def _geo_lookup(event: Event) -> Optional[dict]:
+async def _geo_lookup(event: Event) -> dict | None:
     """Look up IP geolocation via ip-api.com (free, no key needed)."""
     subject = event.subject
     # Only attempt geo lookup if subject looks like an IP address.
     import re
+
     if not re.match(r"^\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}$", subject):
         return None
 

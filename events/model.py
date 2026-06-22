@@ -5,9 +5,8 @@ from __future__ import annotations
 import json
 import uuid
 from dataclasses import dataclass, field
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 from typing import Any
-
 
 # ── Allowed event types (v1) ─────────────────────────────────────────────────
 EVENT_TYPE_DAEMON_STARTED = "audit.daemon_started"
@@ -34,9 +33,7 @@ class Event:
     message: str
     metadata: dict[str, Any] = field(default_factory=dict)
     id: str = field(default_factory=lambda: str(uuid.uuid4()))
-    timestamp: str = field(
-        default_factory=lambda: datetime.now(timezone.utc).isoformat()
-    )
+    timestamp: str = field(default_factory=lambda: datetime.now(UTC).isoformat())
 
     @property
     def metadata_json(self) -> str:
@@ -44,7 +41,7 @@ class Event:
         return json.dumps(self.metadata)
 
     @classmethod
-    def from_row(cls, row: tuple) -> "Event":  # type: ignore[type-arg]
+    def from_row(cls, row: tuple) -> Event:  # type: ignore[type-arg]
         """Reconstruct an Event from a SQLite row tuple.
 
         Row order: id, timestamp, type, severity, source, subject, message, metadata_json

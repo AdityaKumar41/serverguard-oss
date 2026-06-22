@@ -42,11 +42,11 @@ class EmailNotifier(Notifier):
 
     @classmethod
     def from_config(cls, block: dict) -> EmailNotifier:
-        host     = os.environ.get("SERVERGUARD_SMTP_HOST", "")
-        port     = int(os.environ.get("SERVERGUARD_SMTP_PORT", "587"))
-        user     = os.environ.get("SERVERGUARD_SMTP_USER", "")
+        host = os.environ.get("SERVERGUARD_SMTP_HOST", "")
+        port = int(os.environ.get("SERVERGUARD_SMTP_PORT", "587"))
+        user = os.environ.get("SERVERGUARD_SMTP_USER", "")
         password = os.environ.get("SERVERGUARD_SMTP_PASSWORD", "")
-        to       = os.environ.get("SERVERGUARD_SMTP_TO", "")
+        to = os.environ.get("SERVERGUARD_SMTP_TO", "")
         if not host or not user or not to:
             raise ValueError("SMTP host, user, and to address required")
         return cls(host, port, user, password, to)
@@ -57,6 +57,7 @@ class EmailNotifier(Notifier):
 
     async def send(self, event: Event) -> None:
         import asyncio
+
         # SMTP is synchronous — run in executor to avoid blocking event loop.
         loop = asyncio.get_running_loop()
         await loop.run_in_executor(None, self._send_sync, event)

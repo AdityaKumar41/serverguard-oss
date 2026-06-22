@@ -27,14 +27,13 @@ from __future__ import annotations
 
 import logging
 import os
-from dataclasses import dataclass, field
-from enum import Enum
-from typing import Optional
+from dataclasses import dataclass
+from enum import StrEnum
 
 logger = logging.getLogger(__name__)
 
 
-class ProviderName(str, Enum):
+class ProviderName(StrEnum):
     OPENAI = "openai"
     ANTHROPIC = "anthropic"
     OPENROUTER = "openrouter"
@@ -78,7 +77,7 @@ PROVIDER_MODELS: dict[ProviderName, list[str]] = {
         "deepseek-r1",
     ],
     ProviderName.OPENCODE: [
-        "auto",           # OpenCode picks the best free model automatically
+        "auto",  # OpenCode picks the best free model automatically
         "anthropic/claude-sonnet-4-5",
         "openai/gpt-4o",
     ],
@@ -102,41 +101,41 @@ PROVIDER_MODELS: dict[ProviderName, list[str]] = {
 }
 
 PROVIDER_BASE_URLS: dict[ProviderName, str] = {
-    ProviderName.OPENAI:      "https://api.openai.com/v1",
-    ProviderName.ANTHROPIC:   "https://api.anthropic.com/v1",
-    ProviderName.OPENROUTER:  "https://openrouter.ai/api/v1",
-    ProviderName.OLLAMA:      "http://localhost:11434/v1",
-    ProviderName.OPENCODE:    "https://api.opencode.ai/v1",
-    ProviderName.GROQ:        "https://api.groq.com/openai/v1",
-    ProviderName.MISTRAL:     "https://api.mistral.ai/v1",
-    ProviderName.TOGETHER:    "https://api.together.xyz/v1",
-    ProviderName.DISABLED:    "",
+    ProviderName.OPENAI: "https://api.openai.com/v1",
+    ProviderName.ANTHROPIC: "https://api.anthropic.com/v1",
+    ProviderName.OPENROUTER: "https://openrouter.ai/api/v1",
+    ProviderName.OLLAMA: "http://localhost:11434/v1",
+    ProviderName.OPENCODE: "https://api.opencode.ai/v1",
+    ProviderName.GROQ: "https://api.groq.com/openai/v1",
+    ProviderName.MISTRAL: "https://api.mistral.ai/v1",
+    ProviderName.TOGETHER: "https://api.together.xyz/v1",
+    ProviderName.DISABLED: "",
 }
 
 # Human-readable labels for the setup wizard
 PROVIDER_LABELS: dict[ProviderName, str] = {
-    ProviderName.OPENAI:     "OpenAI (GPT-4o, GPT-4o-mini)",
-    ProviderName.ANTHROPIC:  "Anthropic (Claude 3.5 Sonnet)",
+    ProviderName.OPENAI: "OpenAI (GPT-4o, GPT-4o-mini)",
+    ProviderName.ANTHROPIC: "Anthropic (Claude 3.5 Sonnet)",
     ProviderName.OPENROUTER: "OpenRouter (200+ models, one API key)",
-    ProviderName.OLLAMA:     "Ollama (local, free — llama3.2, mistral, etc.)",
-    ProviderName.OPENCODE:   "OpenCode (open-source agent, free tier available)",
-    ProviderName.GROQ:       "Groq (ultra-fast inference, generous free tier)",
-    ProviderName.MISTRAL:    "Mistral AI (mistral-large, codestral)",
-    ProviderName.TOGETHER:   "Together AI (open-source models)",
-    ProviderName.DISABLED:   "Disabled — no AI features",
+    ProviderName.OLLAMA: "Ollama (local, free — llama3.2, mistral, etc.)",
+    ProviderName.OPENCODE: "OpenCode (open-source agent, free tier available)",
+    ProviderName.GROQ: "Groq (ultra-fast inference, generous free tier)",
+    ProviderName.MISTRAL: "Mistral AI (mistral-large, codestral)",
+    ProviderName.TOGETHER: "Together AI (open-source models)",
+    ProviderName.DISABLED: "Disabled — no AI features",
 }
 
 # API key env var per provider (None = no key needed)
-_API_KEY_ENV: dict[ProviderName, Optional[str]] = {
-    ProviderName.OPENAI:     "OPENAI_API_KEY",
-    ProviderName.ANTHROPIC:  "ANTHROPIC_API_KEY",
+_API_KEY_ENV: dict[ProviderName, str | None] = {
+    ProviderName.OPENAI: "OPENAI_API_KEY",
+    ProviderName.ANTHROPIC: "ANTHROPIC_API_KEY",
     ProviderName.OPENROUTER: "OPENROUTER_API_KEY",
-    ProviderName.OLLAMA:     None,           # local, no key
-    ProviderName.OPENCODE:   "OPENCODE_API_KEY",
-    ProviderName.GROQ:       "GROQ_API_KEY",
-    ProviderName.MISTRAL:    "MISTRAL_API_KEY",
-    ProviderName.TOGETHER:   "TOGETHER_API_KEY",
-    ProviderName.DISABLED:   None,
+    ProviderName.OLLAMA: None,  # local, no key
+    ProviderName.OPENCODE: "OPENCODE_API_KEY",
+    ProviderName.GROQ: "GROQ_API_KEY",
+    ProviderName.MISTRAL: "MISTRAL_API_KEY",
+    ProviderName.TOGETHER: "TOGETHER_API_KEY",
+    ProviderName.DISABLED: None,
 }
 
 
@@ -169,10 +168,7 @@ class AIConfig:
             model = PROVIDER_MODELS[provider][0]
 
         # Support custom base_url override (plugin pattern)
-        base_url = (
-            raw.get("base_url", "")
-            or PROVIDER_BASE_URLS.get(provider, "")
-        )
+        base_url = raw.get("base_url", "") or PROVIDER_BASE_URLS.get(provider, "")
 
         return cls(
             provider=provider,
@@ -188,7 +184,7 @@ class AIConfig:
     def enabled(self) -> bool:
         return self.provider != ProviderName.DISABLED
 
-    def api_key(self) -> Optional[str]:
+    def api_key(self) -> str | None:
         """Load the API key from environment (never from config file).
 
         Custom providers can specify their env var via api_key_env in config.

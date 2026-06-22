@@ -17,7 +17,7 @@ def run(config: str) -> None:
         cfg = config_loader.load(config)
     except (FileNotFoundError, ValueError) as exc:
         console.print(f"[bold red]Error:[/] {exc}")
-        raise SystemExit(1)
+        raise SystemExit(1) from None
 
     audit = AuditLog(cfg.audit_db_path)
     ok, errors = audit.verify()
@@ -35,8 +35,7 @@ def run(config: str) -> None:
     else:
         console.print(
             Panel(
-                "[bold red]⚠️ Audit chain BROKEN[/]\n"
-                + "\n".join(f"  • {e}" for e in errors),
+                "[bold red]⚠️ Audit chain BROKEN[/]\n" + "\n".join(f"  • {e}" for e in errors),
                 title="[bold red]ServerGuard Audit — TAMPERING DETECTED[/]",
                 border_style="red",
             )

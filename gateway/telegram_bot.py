@@ -22,8 +22,6 @@ from __future__ import annotations
 import asyncio
 import json
 import logging
-import os
-from typing import Optional
 
 import httpx
 
@@ -140,10 +138,16 @@ class TelegramBot:
         if not self._ai_cfg or not self._ai_cfg.enabled:
             return "❌ AI is not configured. Run `sg setup` to connect an AI provider."
         from agent.client import chat
+
         try:
             events = await self._store.list_events(limit=20)
-            context = "\n".join(f"- [{e.timestamp}] {e.type}: {e.subject} — {e.message}" for e in events)
-            system = "You are a security assistant for a Linux server. Answer questions about security events concisely."
+            context = "\n".join(
+                f"- [{e.timestamp}] {e.type}: {e.subject} — {e.message}" for e in events
+            )
+            system = (
+                "You are a security assistant for a Linux server. "
+                "Answer questions about security events concisely."
+            )
             user_msg = f"Recent events:\n{context}\n\nQuestion: {question}"
             answer = await chat(self._ai_cfg, system, user_msg)
             return f"🤖 {answer or 'No response from AI.'}"

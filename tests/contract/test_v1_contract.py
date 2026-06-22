@@ -7,8 +7,8 @@ from pathlib import Path
 import pytest
 
 from config.loader import load
-from events.model import EVENT_TYPE_SSH_BRUTEFORCE
 from detectors.ssh_bruteforce import SSHBruteforceDetector
+from events.model import EVENT_TYPE_SSH_BRUTEFORCE
 from parsers.ssh_auth import parse_line
 from storage.sqlite import Store
 
@@ -20,6 +20,7 @@ FIXTURE_LOG = REPO_ROOT / "tests" / "fixtures" / "logs" / "auth.log"
 
 # ── Fixture availability check ────────────────────────────────────────────────
 
+
 @pytest.fixture(autouse=True)
 def require_fixtures() -> None:
     if not FIXTURE_CONFIG.exists():
@@ -29,6 +30,7 @@ def require_fixtures() -> None:
 
 
 # ── Config contract ───────────────────────────────────────────────────────────
+
 
 def test_load_shared_fixture_config() -> None:
     """The shared basic.toml must load and validate without error."""
@@ -55,6 +57,7 @@ def test_fixture_config_detector() -> None:
 
 
 # ── Detection contract ────────────────────────────────────────────────────────
+
 
 def test_fixture_log_produces_one_bruteforce_event() -> None:
     """Running the detector against auth.log must yield exactly one SSH brute-force event.
@@ -163,9 +166,10 @@ def test_fixture_non_attacker_ip_does_not_trigger() -> None:
 
 # ── Storage contract ──────────────────────────────────────────────────────────
 
+
 async def test_sqlite_event_roundtrip(tmp_path: Path) -> None:
     """Events written to SQLite must be readable with equivalent logical fields."""
-    from events.model import Event, SEVERITY_WARNING
+    from events.model import SEVERITY_WARNING, Event
 
     db_path = str(tmp_path / "serverguard.db")
     store = await Store.open(db_path)

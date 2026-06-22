@@ -16,7 +16,7 @@ from __future__ import annotations
 import typer
 from rich.console import Console
 
-from cli import cmd_status, cmd_events, cmd_audit, cmd_setup, cmd_model, cmd_ask
+from cli import cmd_ask, cmd_audit, cmd_events, cmd_model, cmd_setup, cmd_status
 from version import __version__
 
 app = typer.Typer(
@@ -43,6 +43,7 @@ console = Console()
 
 # ── Root ──────────────────────────────────────────────────────────────────────
 
+
 @app.callback(invoke_without_command=True)
 def _root(
     ctx: typer.Context,
@@ -54,6 +55,7 @@ def _root(
 
 
 # ── Core commands ─────────────────────────────────────────────────────────────
+
 
 @app.command("setup")
 def setup_cmd() -> None:
@@ -89,6 +91,7 @@ def ask_cmd(
 
 # ── Model sub-commands ────────────────────────────────────────────────────────
 
+
 @model_app.callback(invoke_without_command=True)
 def model_root(ctx: typer.Context) -> None:
     """Switch AI model provider interactively."""
@@ -114,6 +117,7 @@ def model_list_cmd() -> None:
 
 
 # ── Audit sub-commands ────────────────────────────────────────────────────────
+
 
 @audit_app.command("verify")
 def audit_verify_cmd(

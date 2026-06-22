@@ -2,13 +2,8 @@
 
 from __future__ import annotations
 
-import sys
+import tomllib
 from pathlib import Path
-
-if sys.version_info >= (3, 11):
-    import tomllib
-else:
-    import tomli as tomllib  # type: ignore[no-redef]
 
 from config.models import Config, DetectorConfig, LogSource, ServerGuardSection
 from config.validator import validate
@@ -34,7 +29,6 @@ def load(config_path: str) -> Config:
     config.config_path = str(path.resolve())
     validate(config)
     return config
-
 
 
 def _parse(raw: dict) -> Config:  # type: ignore[type-arg]

@@ -19,7 +19,6 @@ from __future__ import annotations
 import logging
 from abc import ABC, abstractmethod
 from dataclasses import dataclass
-from typing import Optional
 
 from events.model import Event
 
@@ -44,6 +43,7 @@ class Notifier(ABC):
 @dataclass
 class NotifierConfig:
     """Raw config for one [[notifiers]] block."""
+
     type: str
     enabled: bool = True
     options: dict = None
@@ -55,11 +55,11 @@ class NotifierConfig:
 
 def build_notifiers(raw_notifier_blocks: list[dict]) -> list[Notifier]:
     """Build the list of active notifiers from config blocks."""
-    from notifiers.telegram import TelegramNotifier
     from notifiers.discord import DiscordNotifier
-    from notifiers.slack import SlackNotifier
-    from notifiers.webhook import WebhookNotifier
     from notifiers.email import EmailNotifier
+    from notifiers.slack import SlackNotifier
+    from notifiers.telegram import TelegramNotifier
+    from notifiers.webhook import WebhookNotifier
 
     type_map = {
         "telegram": TelegramNotifier,

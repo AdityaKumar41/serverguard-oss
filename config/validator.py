@@ -54,12 +54,8 @@ def _validate_detectors(detectors, log_sources) -> None:  # type: ignore[no-unty
             raise ValueError(f"detectors: duplicate name '{d.name}'")
         seen_names.add(d.name)
         if d.enabled and d.source not in source_names:
-            raise ValueError(
-                f"detectors[{d.name}]: references unknown log source '{d.source}'"
-            )
+            raise ValueError(f"detectors[{d.name}]: references unknown log source '{d.source}'")
         if d.failed_attempt_threshold <= 0:
-            raise ValueError(
-                f"detectors[{d.name}]: failed_attempt_threshold must be > 0"
-            )
+            raise ValueError(f"detectors[{d.name}]: failed_attempt_threshold must be > 0")
         if d.window_seconds <= 0:
             raise ValueError(f"detectors[{d.name}]: window_seconds must be > 0")

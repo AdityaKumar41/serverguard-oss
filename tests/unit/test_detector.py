@@ -14,7 +14,10 @@ def _attempt(ip: str, username: str = "root", port: int = 22) -> FailedSSHAttemp
         username=username,
         ip=ip,
         port=port,
-        raw_line=f"Apr 25 10:00:00 host sshd[1]: Failed password for {username} from {ip} port {port} ssh2",
+        raw_line=(
+            f"Apr 25 10:00:00 host sshd[1]: Failed password for {username} "
+            f"from {ip} port {port} ssh2"
+        ),
     )
 
 
@@ -23,6 +26,7 @@ def _make_detector(threshold: int = 5, window: int = 60) -> SSHBruteforceDetecto
 
 
 # ── Threshold detection ───────────────────────────────────────────────────────
+
 
 def test_no_event_below_threshold() -> None:
     det = _make_detector(threshold=5)
@@ -73,6 +77,7 @@ def test_different_ips_are_tracked_independently() -> None:
 
 # ── Deduplication ─────────────────────────────────────────────────────────────
 
+
 def test_no_duplicate_event_within_same_window() -> None:
     """Threshold+1 attempts: only one event (last attempt overlaps previous window).
 
@@ -101,6 +106,7 @@ def test_two_non_overlapping_windows_emit_twice() -> None:
 
 
 # ── Malformed input ───────────────────────────────────────────────────────────
+
 
 def test_empty_attempt_list_produces_no_event() -> None:
     det = _make_detector(threshold=5)

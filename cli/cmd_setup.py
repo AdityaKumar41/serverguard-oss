@@ -16,17 +16,13 @@ from __future__ import annotations
 
 import os
 import platform
-import shutil
 from pathlib import Path
-from typing import Optional
 
-import typer
 from rich.console import Console
 from rich.panel import Panel
-from rich.prompt import Confirm, Prompt
+from rich.prompt import Prompt
 from rich.rule import Rule
 from rich.table import Table
-from rich import print as rprint
 
 console = Console()
 
@@ -38,22 +34,22 @@ DEFAULT_ENV = SG_HOME / ".env"
 
 # Auto-detect common log file paths (Linux + macOS)
 _CANDIDATE_LOG_PATHS = [
-    ("/var/log/auth.log",  "ssh_auth", "Ubuntu/Debian SSH auth log"),
-    ("/var/log/secure",    "ssh_auth", "RHEL/CentOS/Fedora SSH auth log"),
-    ("/var/log/syslog",    "ssh_auth", "General syslog (Debian/Ubuntu)"),
-    ("/var/log/messages",  "ssh_auth", "General syslog (RHEL/CentOS)"),
+    ("/var/log/auth.log", "ssh_auth", "Ubuntu/Debian SSH auth log"),
+    ("/var/log/secure", "ssh_auth", "RHEL/CentOS/Fedora SSH auth log"),
+    ("/var/log/syslog", "ssh_auth", "General syslog (Debian/Ubuntu)"),
+    ("/var/log/messages", "ssh_auth", "General syslog (RHEL/CentOS)"),
 ]
 
 _PROVIDER_CHOICES = {
-    "1": ("openai",      "OpenAI (GPT-4o, GPT-4o-mini)",                 "OPENAI_API_KEY"),
-    "2": ("anthropic",   "Anthropic (Claude 3.5 Sonnet, Claude Haiku)",   "ANTHROPIC_API_KEY"),
-    "3": ("openrouter",  "OpenRouter (200+ models, one API key)",         "OPENROUTER_API_KEY"),
-    "4": ("opencode",    "OpenCode (open-source agent, free tier)",        "OPENCODE_API_KEY"),
-    "5": ("groq",        "Groq (ultra-fast, generous free tier)",          "GROQ_API_KEY"),
-    "6": ("mistral",     "Mistral AI (mistral-large, codestral)",          "MISTRAL_API_KEY"),
-    "7": ("together",    "Together AI (open-source models)",               "TOGETHER_API_KEY"),
-    "8": ("ollama",      "Ollama (local, completely free \u2014 no API key)", None),
-    "9": ("disabled",    "Skip \u2014 no AI features",                        None),
+    "1": ("openai", "OpenAI (GPT-4o, GPT-4o-mini)", "OPENAI_API_KEY"),
+    "2": ("anthropic", "Anthropic (Claude 3.5 Sonnet, Claude Haiku)", "ANTHROPIC_API_KEY"),
+    "3": ("openrouter", "OpenRouter (200+ models, one API key)", "OPENROUTER_API_KEY"),
+    "4": ("opencode", "OpenCode (open-source agent, free tier)", "OPENCODE_API_KEY"),
+    "5": ("groq", "Groq (ultra-fast, generous free tier)", "GROQ_API_KEY"),
+    "6": ("mistral", "Mistral AI (mistral-large, codestral)", "MISTRAL_API_KEY"),
+    "7": ("together", "Together AI (open-source models)", "TOGETHER_API_KEY"),
+    "8": ("ollama", "Ollama (local, completely free \u2014 no API key)", None),
+    "9": ("disabled", "Skip \u2014 no AI features", None),
 }
 
 _NOTIFIER_CHOICES = {
@@ -101,6 +97,7 @@ def run() -> None:
 
     if provider_id != "disabled":
         from agent.providers import PROVIDER_MODELS, ProviderName
+
         try:
             pname = ProviderName(provider_id)
             available = PROVIDER_MODELS.get(pname, [])
@@ -125,7 +122,9 @@ def run() -> None:
 
     while True:
         _print_notifier_choices()
-        choice = Prompt.ask("Add channel (or 6 to continue)", choices=["1","2","3","4","5","6"], default="6")
+        choice = Prompt.ask(
+            "Add channel (or 6 to continue)", choices=["1", "2", "3", "4", "5", "6"], default="6"
+        )
         if choice == "6":
             break
 
@@ -175,33 +174,36 @@ def run() -> None:
     _write_env(api_key=api_key, env_var=env_var, extras=env_additions)
 
     # ── Done ──────────────────────────────────────────────────────────────────
-    console.print(Panel(
-        f"[bold green]\u2705 Setup complete![/]\n\n"
-        f"Config written to: [cyan]{DEFAULT_CONFIG}[/]\n"
-        f"Secrets stored in: [cyan]{DEFAULT_ENV}[/]\n\n"
-        f"[bold]Start the daemon:[/]\n"
-        f"  [dim]sgd --config {DEFAULT_CONFIG}[/]\n\n"
-        f"[bold]Check status:[/]\n"
-        f"  [dim]sg status --config {DEFAULT_CONFIG}[/]\n\n"
-        f"[bold]View events:[/]\n"
-        f"  [dim]sg events --config {DEFAULT_CONFIG}[/]",
-        title="\U0001f6e1\ufe0f  ServerGuard Ready",
-        border_style="green",
-    ))
+    console.print(
+        Panel(
+            f"[bold green]\u2705 Setup complete![/]\n\n"
+            f"Config written to: [cyan]{DEFAULT_CONFIG}[/]\n"
+            f"Secrets stored in: [cyan]{DEFAULT_ENV}[/]\n\n"
+            f"[bold]Start the daemon:[/]\n"
+            f"  [dim]sgd --config {DEFAULT_CONFIG}[/]\n\n"
+            f"[bold]Check status:[/]\n"
+            f"  [dim]sg status --config {DEFAULT_CONFIG}[/]\n\n"
+            f"[bold]View events:[/]\n"
+            f"  [dim]sg events --config {DEFAULT_CONFIG}[/]",
+            title="\U0001f6e1\ufe0f  ServerGuard Ready",
+            border_style="green",
+        )
+    )
 
 
 # ── Helpers ───────────────────────────────────────────────────────────────────
+
 
 def _print_banner() -> None:
     console.print()
     console.print(
         "[bold cyan]"
-        "  \u2588\u2588\u2588\u2588\u2588\u2588\u2557\u2588\u2588\u2588\u2588\u2588\u2588\u2557 \u2588\u2588\u2588\u2588\u2588\u2588\u2557 \u2588\u2588\u2557   \u2588\u2588\u2557\u2588\u2588\u2588\u2588\u2588\u2588\u2557 \u2588\u2588\u2588\u2588\u2588\u2588\u2557 \n"
-        "  \u2588\u2588\u2554\u2550\u2550\u2550\u2550\u255d\u2588\u2588\u2554\u2550\u2550\u2550\u2550\u255d\u2588\u2588\u2554\u2550\u2550\u2550\u2550\u255d \u2588\u2588\u2551   \u2588\u2588\u2551\u2588\u2588\u2554\u2550\u2550\u2550\u2550\u255d\u2588\u2588\u2554\u2550\u2550\u2550\u2550\u255d \n"
-        "  \u2588\u2588\u2588\u2588\u2588\u2557  \u2588\u2588\u2588\u2588\u2588\u2557  \u2588\u2588\u2551\u2588\u2588\u2588\u2557\u2588\u2588\u2551   \u2588\u2588\u2551\u2588\u2588\u2588\u2588\u2588\u2551  \u2588\u2588\u2588\u2588\u2588\u2557  \n"
-        "  \u2588\u2588\u2554\u2550\u2550\u255d  \u2588\u2588\u2554\u2550\u2550\u255d  \u2588\u2588\u2551\u255a\u2588\u2588\u2554\u2588\u2588\u2551   \u2588\u2588\u2551\u2588\u2588\u2554\u2550\u2550\u255d  \u2588\u2588\u2554\u2550\u2550\u255d  \n"
-        "  \u2588\u2588\u2551     \u2588\u2588\u2588\u2588\u2588\u2588\u2557 \u255a\u2588\u2588\u2554\u2550\u2550\u2554\u2550\u2550\u2550\u255d\u2588\u2588\u2551\u2588\u2588\u2588\u2588\u2588\u2588\u2557\u2588\u2588\u2588\u2588\u2588\u2588\u2557 \n"
-        "  \u255a\u2550\u255d     \u255a\u2550\u2550\u2550\u2550\u2550\u255d  \u255a\u2550\u255d  \u255a\u255d     \u255a\u2550\u255d\u255a\u2550\u2550\u2550\u2550\u2550\u255d\u255a\u2550\u2550\u2550\u2550\u2550\u255d [/]"
+        "  \u2588\u2588\u2588\u2588\u2588\u2588\u2557\u2588\u2588\u2588\u2588\u2588\u2588\u2557 \u2588\u2588\u2588\u2588\u2588\u2588\u2557 \u2588\u2588\u2557   \u2588\u2588\u2557\u2588\u2588\u2588\u2588\u2588\u2588\u2557 \u2588\u2588\u2588\u2588\u2588\u2588\u2557 \n"  # noqa: E501
+        "  \u2588\u2588\u2554\u2550\u2550\u2550\u2550\u255d\u2588\u2588\u2554\u2550\u2550\u2550\u2550\u255d\u2588\u2588\u2554\u2550\u2550\u2550\u2550\u255d \u2588\u2588\u2551   \u2588\u2588\u2551\u2588\u2588\u2554\u2550\u2550\u2550\u2550\u255d\u2588\u2588\u2554\u2550\u2550\u2550\u2550\u255d \n"  # noqa: E501
+        "  \u2588\u2588\u2588\u2588\u2588\u2557  \u2588\u2588\u2588\u2588\u2588\u2557  \u2588\u2588\u2551\u2588\u2588\u2588\u2557\u2588\u2588\u2551   \u2588\u2588\u2551\u2588\u2588\u2588\u2588\u2588\u2551  \u2588\u2588\u2588\u2588\u2588\u2557  \n"  # noqa: E501
+        "  \u2588\u2588\u2554\u2550\u2550\u255d  \u2588\u2588\u2554\u2550\u2550\u255d  \u2588\u2588\u2551\u255a\u2588\u2588\u2554\u2588\u2588\u2551   \u2588\u2588\u2551\u2588\u2588\u2554\u2550\u2550\u255d  \u2588\u2588\u2554\u2550\u2550\u255d  \n"  # noqa: E501
+        "  \u2588\u2588\u2551     \u2588\u2588\u2588\u2588\u2588\u2588\u2557 \u255a\u2588\u2588\u2554\u2550\u2550\u2554\u2550\u2550\u2550\u255d\u2588\u2588\u2551\u2588\u2588\u2588\u2588\u2588\u2588\u2557\u2588\u2588\u2588\u2588\u2588\u2588\u2557 \n"  # noqa: E501
+        "  \u255a\u2550\u255d     \u255a\u2550\u2550\u2550\u2550\u2550\u255d  \u255a\u2550\u255d  \u255a\u255d     \u255a\u2550\u255d\u255a\u2550\u2550\u2550\u2550\u2550\u255d\u255a\u2550\u2550\u2550\u2550\u2550\u255d [/]"  # noqa: E501
         "[bold white]GUARD[/]"
     )
     console.print()
@@ -233,9 +235,9 @@ def _print_notifier_choices() -> None:
     console.print(table)
 
 
-def _configure_notifier(ntype: str) -> tuple[Optional[dict], dict]:
+def _configure_notifier(ntype: str) -> tuple[dict | None, dict]:
     env: dict[str, str] = {}
-    cfg: Optional[dict] = {"type": ntype, "enabled": True}
+    cfg: dict | None = {"type": ntype, "enabled": True}
 
     if ntype == "telegram":
         token = Prompt.ask("  Telegram Bot Token (from @BotFather)", password=True, default="")
@@ -268,15 +270,17 @@ def _configure_notifier(ntype: str) -> tuple[Optional[dict], dict]:
         host = Prompt.ask("  SMTP Host", default="smtp.gmail.com")
         port = Prompt.ask("  SMTP Port", default="587")
         user = Prompt.ask("  SMTP Username")
-        pwd  = Prompt.ask("  SMTP Password / App Password", password=True, default="")
-        to   = Prompt.ask("  Send alerts to (email address)")
-        env.update({
-            "SERVERGUARD_SMTP_HOST": host,
-            "SERVERGUARD_SMTP_PORT": port,
-            "SERVERGUARD_SMTP_USER": user,
-            "SERVERGUARD_SMTP_PASSWORD": pwd,
-            "SERVERGUARD_SMTP_TO": to,
-        })
+        pwd = Prompt.ask("  SMTP Password / App Password", password=True, default="")
+        to = Prompt.ask("  Send alerts to (email address)")
+        env.update(
+            {
+                "SERVERGUARD_SMTP_HOST": host,
+                "SERVERGUARD_SMTP_PORT": port,
+                "SERVERGUARD_SMTP_USER": user,
+                "SERVERGUARD_SMTP_PASSWORD": pwd,
+                "SERVERGUARD_SMTP_TO": to,
+            }
+        )
 
     return cfg, env
 
@@ -333,7 +337,7 @@ def _write_config(
     DEFAULT_CONFIG.write_text("\n".join(lines))
 
 
-def _write_env(api_key: str, env_var: Optional[str], extras: dict) -> None:
+def _write_env(api_key: str, env_var: str | None, extras: dict) -> None:
     lines = [
         "# ServerGuard secrets \u2014 DO NOT COMMIT THIS FILE",
         "# Generated by: sg setup",

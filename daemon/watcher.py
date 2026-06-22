@@ -11,8 +11,8 @@ from __future__ import annotations
 
 import asyncio
 import logging
+from collections.abc import AsyncIterator
 from pathlib import Path
-from typing import AsyncIterator, Callable, Awaitable
 
 logger = logging.getLogger(__name__)
 

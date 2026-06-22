@@ -18,7 +18,6 @@ from __future__ import annotations
 
 import logging
 import os
-from typing import Optional
 
 import httpx
 
@@ -70,6 +69,7 @@ class TelegramNotifier(Notifier):
 
         # Append AI summary if available
         import json
+
         try:
             meta = json.loads(event.metadata_json or "{}")
             if ai_summary := meta.get("ai_summary"):

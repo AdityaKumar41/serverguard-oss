@@ -3,9 +3,9 @@
 from __future__ import annotations
 
 import typer
+from rich import box
 from rich.console import Console
 from rich.table import Table
-from rich import box
 
 from config import loader as config_loader
 from storage.sqlite import SyncStore
@@ -24,12 +24,12 @@ def run(config_path: str, limit: int = 50) -> None:
     """Display stored events in reverse chronological order."""
     try:
         cfg = config_loader.load(config_path)
-    except FileNotFoundError as exc:
-        console.print(f"[bold red]ERROR[/] {exc}")
-        raise typer.Exit(1)
+    except FileNotFoundError:
+        console.print("[bold red]ERROR[/] Config file not found")
+        raise typer.Exit(1) from None
     except ValueError as exc:
         console.print(f"[bold red]ERROR[/] Config validation failed: {exc}")
-        raise typer.Exit(1)
+        raise typer.Exit(1) from None
 
     try:
         store = SyncStore(cfg.db_path)
@@ -38,7 +38,7 @@ def run(config_path: str, limit: int = 50) -> None:
             f"[bold yellow]No database found at {cfg.db_path}[/]\n"
             "Run [bold]sgd --config[/] to start the daemon first."
         )
-        raise typer.Exit(1)
+        raise typer.Exit(1) from None
 
     events = store.list_events()
     store.close()

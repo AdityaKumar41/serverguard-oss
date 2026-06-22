@@ -22,7 +22,6 @@ import logging
 import os
 import signal
 import sys
-from pathlib import Path
 
 import typer
 
@@ -30,14 +29,14 @@ from config import loader as config_loader
 from config.models import Config, DetectorConfig, LogSource
 from daemon.watcher import LogWatcher
 from detectors.ssh_bruteforce import SSHBruteforceDetector
-from events.model import Event, make_daemon_started, make_daemon_stopping
+from events.model import make_daemon_started, make_daemon_stopping
 from parsers import ssh_auth
-from storage.sqlite import Store
 from security.input_sanitizer import (
     check_config_file_permissions,
     check_data_dir_permissions,
 )
 from security.rate_limiter import RateLimiter
+from storage.sqlite import Store
 
 logger = logging.getLogger("serverguard.daemon")
 
@@ -59,12 +58,12 @@ def start(
     _setup_logging(verbose)
     try:
         cfg = config_loader.load(config)
-    except FileNotFoundError as exc:
-        typer.echo(f"[ERROR] {exc}", err=True)
-        raise typer.Exit(1)
+    except FileNotFoundError:
+        typer.echo("[ERROR] Config file not found", err=True)
+        raise typer.Exit(1) from None
     except ValueError as exc:
         typer.echo(f"[ERROR] Config validation failed: {exc}", err=True)
-        raise typer.Exit(1)
+        raise typer.Exit(1) from None
 
     logger.info("Config loaded — instance: %s", cfg.serverguard.instance_id)
     asyncio.run(_run_daemon(cfg, replay=replay))
@@ -76,6 +75,7 @@ def main() -> None:
 
 
 # ── Async daemon core ─────────────────────────────────────────────────────────
+
 
 async def _run_daemon(cfg: Config, replay: bool = False) -> None:
     """Async daemon loop."""
@@ -101,7 +101,6 @@ async def _run_daemon(cfg: Config, replay: bool = False) -> None:
     logger.info("Daemon started — watching %d log source(s)", len(cfg.log_sources))
     if replay:
         logger.info("Replay mode: processing existing log content from start")
-
 
     # Install signal handlers for clean shutdown.
     stop_event = asyncio.Event()
@@ -159,7 +158,6 @@ async def _watch_source(
             if attempt is None:
                 continue
             for event in detector.feed(attempt):
-
                 logger.warning(
                     "DETECTED [%s] %s — %s",
                     event.type,
@@ -185,6 +183,7 @@ def _build_detector(ls: LogSource, det_cfg: DetectorConfig):  # type: ignore[no-
 
 
 # ── Logging setup ─────────────────────────────────────────────────────────────
+
 
 def _setup_logging(verbose: bool) -> None:
     level = logging.DEBUG if verbose else logging.INFO

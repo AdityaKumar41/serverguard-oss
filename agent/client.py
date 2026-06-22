@@ -8,7 +8,6 @@ This keeps the client simple and provider-agnostic.
 from __future__ import annotations
 
 import logging
-from typing import Optional
 
 import httpx
 
@@ -23,7 +22,7 @@ async def chat(
     cfg: AIConfig,
     system_prompt: str,
     user_message: str,
-) -> Optional[str]:
+) -> str | None:
     """Send one chat turn and return the assistant's reply.
 
     Returns None if AI is disabled or if the call fails (non-fatal).

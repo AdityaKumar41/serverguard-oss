@@ -16,10 +16,8 @@ Schema (from spec/database.md):
 
 from __future__ import annotations
 
-import asyncio
 import sqlite3
 from pathlib import Path
-from typing import AsyncIterator
 
 import aiosqlite
 
@@ -71,7 +69,7 @@ class Store:
         self._db = db
 
     @classmethod
-    async def open(cls, db_path: str) -> "Store":
+    async def open(cls, db_path: str) -> Store:
         """Open or create the database and apply the v1 schema.
 
         Raises:
@@ -124,7 +122,7 @@ class Store:
         await self._db.close()
 
 
-def open_store_sync(db_path: str) -> "SyncStore":
+def open_store_sync(db_path: str) -> SyncStore:
     """Open a synchronous store for CLI commands that don't use asyncio."""
     return SyncStore(db_path)
 

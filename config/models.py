@@ -45,9 +45,11 @@ class Config:
     @property
     def db_path(self) -> str:
         import os
+
         return os.path.join(self.serverguard.data_dir, "serverguard.db")
 
     @property
     def audit_db_path(self) -> str:
         import os
+
         return os.path.join(self.serverguard.data_dir, "audit.db")

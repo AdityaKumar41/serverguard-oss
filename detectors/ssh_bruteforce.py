@@ -12,7 +12,7 @@ detection window.
 from __future__ import annotations
 
 from collections import defaultdict
-from typing import Iterator
+from collections.abc import Iterator
 
 from detectors.base import Detector
 from events.model import (

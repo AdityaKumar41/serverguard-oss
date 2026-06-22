@@ -33,13 +33,13 @@ test-contract:
 # ── Lint & Format ─────────────────────────────────────────────────────────────
 
 lint:
-	$(RUFF) check serverguard/ tests/
+	$(RUFF) check agent cli config daemon detectors events gateway notifiers parsers security storage tests version.py
 
 fmt:
-	$(RUFF) format serverguard/ tests/
+	$(RUFF) format agent cli config daemon detectors events gateway notifiers parsers security storage tests version.py
 
 fmt-check:
-	$(RUFF) format --check serverguard/ tests/
+	$(RUFF) format --check agent cli config daemon detectors events gateway notifiers parsers security storage tests version.py
 
 # ── Run ───────────────────────────────────────────────────────────────────────
 

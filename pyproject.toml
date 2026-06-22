@@ -54,6 +54,7 @@ dev = [
 [project.scripts]
 sg  = "cli.main:app"
 sgd = "daemon.daemon:main"
+serverguard = "cli.main:app"
 
 [project.urls]
 Homepage      = "https://github.com/serverguard-oss/serverguard"

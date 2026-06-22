@@ -33,29 +33,18 @@ jobs:
           name: python-package-distributions
           path: dist/
 
-  publish-pypi:
-    name: Publish to PyPI
+  github-release:
+    name: Create GitHub Release
     needs: build
     runs-on: ubuntu-latest
-    environment:
-      name: pypi
-      url: https://pypi.org/p/serverguard
     steps:
+      - uses: actions/checkout@v4
+
       - name: Download distributions
         uses: actions/download-artifact@v4
         with:
           name: python-package-distributions
           path: dist/
-
-      - name: Publish to PyPI
-        uses: pypa/gh-action-pypi-publish@release/v1
-
-  github-release:
-    name: Create GitHub Release
-    needs: publish-pypi
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
 
       - name: Extract changelog entry
         id: changelog

@@ -57,11 +57,11 @@ sgd = "daemon.daemon:main"
 serverguard = "cli.main:app"
 
 [project.urls]
-Homepage      = "https://github.com/serverguard-oss/serverguard"
-Repository    = "https://github.com/serverguard-oss/serverguard"
-Issues        = "https://github.com/serverguard-oss/serverguard/issues"
-Changelog     = "https://github.com/serverguard-oss/serverguard/blob/main/CHANGELOG.md"
-Documentation = "https://github.com/serverguard-oss/serverguard/tree/main/docs"
+Homepage      = "https://github.com/AdityaKumar41/serverguard-oss"
+Repository    = "https://github.com/AdityaKumar41/serverguard-oss"
+Issues        = "https://github.com/AdityaKumar41/serverguard-oss/issues"
+Changelog     = "https://github.com/AdityaKumar41/serverguard-oss/blob/main/CHANGELOG.md"
+Documentation = "https://github.com/AdityaKumar41/serverguard-oss/tree/main/docs"
 
 [tool.hatch.build.targets.wheel]
 packages = [

@@ -5,8 +5,8 @@ Thank you for your interest in contributing! ServerGuard is an open-source proje
 ## Development Setup
 
 ```bash
-git clone https://github.com/serverguard-oss/serverguard
-cd serverguard
+git clone https://github.com/AdityaKumar41/serverguard-oss
+cd serverguard-oss
 
 # Create a virtualenv and install all dev dependencies
 make install-dev

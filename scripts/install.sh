@@ -1,10 +1,10 @@
 #!/usr/bin/env bash
 # ServerGuard — one-line installer
-# Usage: curl -fsSL https://raw.githubusercontent.com/serverguard-oss/serverguard/main/scripts/install.sh | bash
+# Usage: curl -fsSL https://raw.githubusercontent.com/AdityaKumar41/serverguard-oss/main/scripts/install.sh | bash
 
 set -euo pipefail
 
-REPO="serverguard-oss/serverguard"
+REPO="AdityaKumar41/serverguard-oss"
 PACKAGE="serverguard"
 MIN_PYTHON="3.11"
 
@@ -104,15 +104,15 @@ echo -e "${BOLD}Security Recommendations:${NC}"
 echo "  1. Create a dedicated system user:  sudo useradd -r -s /bin/false serverguard"
 echo "  2. Set config permissions:          chmod 600 /etc/serverguard/config.toml"
 echo "  3. Enable as a service:             sudo systemctl enable --now serverguard"
-echo "  4. Verify audit integrity:          sg audit verify"
+echo "  4. Verify audit integrity:          serverguard audit verify"
 echo ""
 
 # ── Next steps ────────────────────────────────────────────────────────────────
 echo -e "${BOLD}Quick Start:${NC}"
-echo "  sg status --config /etc/serverguard/config.toml"
-echo "  sg events --config /etc/serverguard/config.toml"
+echo "  serverguard status --config /etc/serverguard/config.toml"
+echo "  serverguard events --config /etc/serverguard/config.toml"
 echo "  sgd --config /etc/serverguard/config.toml"
 echo ""
-echo "  Docs: https://github.com/serverguard-oss/serverguard/tree/main/docs"
+echo "  Docs: https://github.com/AdityaKumar41/serverguard-oss/tree/main/docs"
 echo ""
 success "Installation complete! 🛡️"

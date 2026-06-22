@@ -75,7 +75,7 @@ class DiscordNotifier(Notifier):
 
         payload = {
             "username": "ServerGuard",
-            "avatar_url": "https://raw.githubusercontent.com/serverguard-oss/serverguard/main/image/image.png",
+            "avatar_url": "https://raw.githubusercontent.com/AdityaKumar41/serverguard-oss/main/image/image.png",
             "embeds": [
                 {
                     "title": f"🛡️ Security Alert — {event.type}",

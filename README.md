@@ -6,7 +6,7 @@
 
 **Detect threats. Get alerts. Self-improve. Protect your server 24/7.**
 
-[![CI](https://github.com/serverguard-oss/serverguard/actions/workflows/ci.yml/badge.svg)](https://github.com/serverguard-oss/serverguard/actions)
+[![CI](https://github.com/AdityaKumar41/serverguard-oss/actions/workflows/ci.yml/badge.svg)](https://github.com/AdityaKumar41/serverguard-oss/actions)
 [![PyPI version](https://img.shields.io/pypi/v/serverguard?color=green)](https://pypi.org/project/serverguard/)
 [![Python 3.11+](https://img.shields.io/badge/python-3.11%2B-blue)](https://python.org)
 [![License: MIT](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
@@ -58,7 +58,7 @@ $ sgd --config ~/.serverguard/config.toml
 **One line:**
 
 ```bash
-curl -fsSL https://raw.githubusercontent.com/serverguard-oss/serverguard/main/scripts/install.sh | bash
+curl -fsSL https://raw.githubusercontent.com/AdityaKumar41/serverguard-oss/main/scripts/install.sh | bash
 ```
 
 **Or via pipx (recommended):**
@@ -351,8 +351,8 @@ Full reference: [docs/configuration.md](docs/configuration.md)
 ## Development
 
 ```bash
-git clone https://github.com/serverguard-oss/serverguard
-cd serverguard
+git clone https://github.com/AdityaKumar41/serverguard-oss
+cd serverguard-oss
 
 make install-dev    # creates .venv + installs all dev deps
 make test           # 44+ tests (unit + contract)

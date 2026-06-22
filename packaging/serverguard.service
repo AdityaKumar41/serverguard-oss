@@ -1,6 +1,6 @@
 [Unit]
 Description=ServerGuard — Autonomous Server Guardian
-Documentation=https://github.com/serverguard-oss/serverguard
+Documentation=https://github.com/AdityaKumar41/serverguard-oss
 After=network.target
 Wants=network.target
 

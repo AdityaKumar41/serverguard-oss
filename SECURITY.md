@@ -14,7 +14,7 @@ ServerGuard handles sensitive server data — responsible disclosure is critical
 
 ### How to Report
 
-1. Go to **[GitHub Security Advisories](https://github.com/serverguard-oss/serverguard/security/advisories/new)**
+1. Go to **[GitHub Security Advisories](https://github.com/AdityaKumar41/serverguard-oss/security/advisories/new)**
 2. Submit a private advisory with:
    - A description of the vulnerability
    - Steps to reproduce

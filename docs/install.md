@@ -7,7 +7,7 @@ ServerGuard requires **Python 3.11+**. It runs on Linux and macOS.
 ## One-Line Install (Linux/macOS)
 
 ```bash
-curl -fsSL https://raw.githubusercontent.com/serverguard-oss/serverguard/main/scripts/install.sh | bash
+curl -fsSL https://raw.githubusercontent.com/AdityaKumar41/serverguard-oss/main/scripts/install.sh | bash
 ```
 
 This installs `sg` and `sgd` via `pipx` (isolated environment, no system Python pollution).
@@ -34,8 +34,8 @@ pip install serverguard
 ## Install from Source
 
 ```bash
-git clone https://github.com/serverguard-oss/serverguard
-cd serverguard
+git clone https://github.com/AdityaKumar41/serverguard-oss
+cd serverguard-oss
 make install-dev    # creates .venv and installs all dependencies
 ```
 

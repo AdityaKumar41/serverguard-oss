@@ -56,4 +56,4 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Port scan detector not yet implemented
 - AI anomaly baseline not yet implemented
 
-[0.0.1]: https://github.com/serverguard-oss/serverguard/releases/tag/v0.0.1
+[0.0.1]: https://github.com/AdityaKumar41/serverguard-oss/releases/tag/v0.0.1

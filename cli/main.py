@@ -18,7 +18,7 @@ from rich.console import Console
 
 from cli import cmd_ask, cmd_audit, cmd_events, cmd_model, cmd_setup, cmd_status
 
-__version__ = "0.0.1"
+__version__ = "0.0.2"
 
 app = typer.Typer(
     name="sg",

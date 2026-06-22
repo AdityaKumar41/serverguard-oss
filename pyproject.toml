@@ -4,7 +4,7 @@ build-backend = "hatchling.build"
 
 [project]
 name = "serverguard"
-version = "0.0.1"
+version = "0.0.2"
 description = "Autonomous server guardian — AI-powered threat detection, self-healing, and monitoring for Linux servers"
 readme = "README.md"
 license = { text = "MIT" }
